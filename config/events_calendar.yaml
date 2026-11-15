@@ -1,0 +1,29 @@
+# Scheduled market events. Edit freely; the pipeline injects today's (and tomorrow's) events
+# into the LLM prompt and the app header.
+#
+# Each event: date (YYYY-MM-DD), name, category, importance (low/medium/high), optional note.
+# Categories: monetary_policy, macro_data, global, expiry, budget, other
+#
+# Recurring events handled automatically in code (no need to list them):
+#   - NIFTY weekly F&O expiry (weekday set in settings.yaml -> calendar.weekly_expiry_weekday,
+#     moved to the previous trading day if it falls on a holiday)
+#   - Monthly F&O expiry (last expiry weekday of the month)
+#   - India CPI release (12th of each month, 16:00 IST; next working day if a holiday)
+#
+# Dates below were cross-checked against public calendars in Nov 2026. Verify against the
+# official RBI / Federal Reserve / MoSPI pages before relying on them.
+events:
+  # --- RBI Monetary Policy Committee (decision on the last day) ---
+  - {date: 2026-12-02, name: "RBI MPC meeting begins", category: monetary_policy, importance: medium}
+  - {date: 2026-12-04, name: "RBI MPC policy decision (10:00 IST)", category: monetary_policy, importance: high}
+  - {date: 2027-02-05, name: "RBI MPC policy decision (10:00 IST)", category: monetary_policy, importance: high, note: "verify date"}
+
+  # --- US Federal Reserve FOMC (decision ~00:30 IST the next morning) ---
+  - {date: 2026-12-09, name: "US FOMC rate decision + dot plot (result early 10 Dec IST)", category: global, importance: high}
+  - {date: 2026-12-10, name: "Market reacts to overnight FOMC decision", category: global, importance: high}
+
+  # --- India macro ---
+  - {date: 2026-11-27, name: "India Q2 FY27 GDP data (evening)", category: macro_data, importance: high, note: "verify date"}
+
+  # --- Union Budget ---
+  - {date: 2027-02-01, name: "Union Budget FY28", category: budget, importance: high}

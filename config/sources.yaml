@@ -1,0 +1,116 @@
+# News sources. Set enabled: false to switch one off. Every source is isolated:
+# a failure is logged and the run continues.
+
+rss:
+  - {name: Economic Times, url: "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms", enabled: true}
+  - {name: Economic Times, url: "https://economictimes.indiatimes.com/markets/stocks/news/rssfeeds/2146842.cms", enabled: true}
+  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/marketreports.xml", enabled: true}
+  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/business.xml", enabled: true}
+  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/buzzingstocks.xml", enabled: true}
+  - {name: Livemint, url: "https://www.livemint.com/rss/markets", enabled: true}
+  - {name: Business Standard, url: "https://www.business-standard.com/rss/markets-106.rss", enabled: true}
+  - {name: Hindu BusinessLine, url: "https://www.thehindubusinessline.com/markets/feeder/default.rss", enabled: true}
+  - {name: RBI, url: "https://www.rbi.org.in/pressreleases_rss.xml", enabled: true}
+  - {name: SEBI, url: "https://www.sebi.gov.in/sebirss.xml", enabled: true}
+
+google_news:
+  enabled: true
+  base_url: "https://news.google.com/rss/search"
+  params: {hl: en-IN, gl: IN, ceid: "IN:en"}
+  max_items_per_query: 25
+  queries:
+    - Nifty
+    - Sensex
+    - RBI policy
+    - FII DII
+    - crude oil price India
+    - rupee dollar
+    - GIFT Nifty
+    - US Fed
+    - SEBI
+    - stocks to watch today
+    - block deal NSE
+    - quarterly results profit
+    - order win shares
+    - Nifty Bank stocks
+    - Nifty IT stocks
+    - pharma stocks India
+    - auto stocks India
+    - metal stocks India
+    - FMCG stocks India
+    - PSU stocks
+    - realty stocks India
+    - energy oil gas stocks India
+    - telecom stocks India
+
+bse:
+  enabled: true
+  url: "https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w"
+  max_pages: 8
+
+nse:
+  enabled: true
+  home_url: "https://www.nseindia.com/"
+  warmup_url: "https://www.nseindia.com/companies-listing/corporate-filings-announcements"
+  api_url: "https://www.nseindia.com/api/corporate-announcements"
+
+gnews:
+  enabled: true                 # only runs if GNEWS_API_KEY is set
+  url: "https://gnews.io/api/v4/search"
+  daily_request_limit: 100
+  max_requests_per_run: 8       # leaves room for manual reruns
+  queries: ["Nifty OR Sensex", "NSE stocks", "RBI", "Indian rupee"]
+
+# Corporate announcements with these phrases are routine and dropped before the LLM.
+routine_announcement_phrases:
+  - trading window
+  - newspaper publication
+  - newspaper advertisement
+  - certificate under regulation 74
+  - reg. 74 (5)
+  - compliances-certificate
+  - loss of share certificate
+  - duplicate share certificate
+  - issue of duplicate
+  - investor complaints
+  - copy of newspaper
+  - change in registrar
+  - analyst / investor meet - intimation
+  - analysts/institutional investor meet
+  - schedule of analyst
+  - earnings call transcript
+  - audio recording
+  - closure of trading window
+  - esop
+  - esos
+  - allotment of esop
+  - record date for interest
+  - statement of deviation
+  - disclosure under regulation 31
+  - shareholding pattern
+  - secretarial compliance
+  - book closure
+
+# Generic news with these keywords (in title) is dropped as clearly irrelevant.
+irrelevant_keywords:
+  - cricket
+  - ipl
+  - bollywood
+  - box office
+  - recipe
+  - horoscope
+  - astrology
+  - celebrity
+  - fashion
+  - lifestyle
+  - wedding
+  - movie review
+  - web series
+  - netflix
+  - travel tips
+  - weight loss
+  - health tips
+  - football
+  - tennis
+  - olympics
+  - zodiac

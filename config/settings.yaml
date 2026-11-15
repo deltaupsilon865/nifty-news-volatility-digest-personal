@@ -1,0 +1,110 @@
+# Central settings. Every tunable number lives here.
+
+timezone: Asia/Kolkata
+market_close_time: "15:30"      # previous session close; collection window starts here
+max_run_seconds: 900            # hard run-time limit for the whole pipeline
+http_timeout_seconds: 15
+user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
+
+calendar:
+  weekly_expiry_weekday: 1      # 0=Mon ... 1=Tue (NIFTY weekly expiry)
+  cpi_release_day: 12
+
+dedupe:
+  title_similarity_threshold: 85  # rapidfuzz token_set_ratio
+  # Lower number = more authoritative when choosing which duplicate to keep.
+  source_priority:
+    "NSE Announcements": 1
+    "BSE Announcements": 1
+    "RBI": 1
+    "SEBI": 1
+    "Economic Times": 2
+    "Moneycontrol": 2
+    "Business Standard": 2
+    "Livemint": 2
+    "Hindu BusinessLine": 2
+    "GNews": 4
+    "Google News": 5
+
+prefilter:
+  max_items_to_llm: 450         # safety cap after filtering (cost control)
+  snippet_max_chars: 300
+
+scoring:
+  model_env: SCORING_MODEL
+  default_model: claude-haiku-5-5
+  batch_size: 15
+  max_retries: 3
+  effort: low
+  max_tokens: 8000
+  # USD per million tokens, used for the spend estimate in logs.
+  pricing:
+    claude-haiku-5-5: {input: 0.10, output: 0.50, cache_read: 0.01, cache_write: 0.125}
+    claude-sonnet-5-5: {input: 2.00, output: 10.00, cache_read: 0.10, cache_write: 2.50}
+  max_daily_usd_env: MAX_DAILY_LLM_USD
+  default_max_daily_usd: 1.00
+  min_severity_to_keep: 2       # items scored below this are dropped before mapping
+
+reference:
+  equity_master_url: "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+  equity_master_path: data/reference/EQUITY_L.csv
+  # AMFI publishes average market cap every January and July. {stamp} is replaced with
+  # candidates like 30Jun2026 / 31Dec2025, newest first. Override amfi_url to pin a file.
+  amfi_url_template: "https://www.amfiindia.com/Themes/Theme1/downloads/AverageMarketCapitalization{stamp}.xlsx"
+  amfi_url: ""
+  amfi_path: data/reference/amfi_market_cap.xlsx
+  max_age_days: 7               # refresh the symbol master weekly
+
+mapping:
+  fuzzy_threshold: 88
+  index_symbol: "NIFTY 50"
+
+cap_buckets:
+  large_max_rank: 100
+  mid_max_rank: 250
+
+penny:
+  max_price: 20                 # last close below this (INR) ...
+  max_market_cap_cr: 500        # ... OR market cap below this (INR crore)
+
+volatility:
+  history_days: 60
+  atr_window: 20
+  chart_sessions: 20
+  max_stocks_per_run: 150
+  severity_multipliers:         # [min_severity, max_severity, multiplier]
+    - [1, 3, 1.0]
+    - [4, 6, 1.3]
+    - [7, 8, 1.7]
+    - [9, 10, 2.2]
+  # Share of the expected range placed ABOVE the previous close.
+  direction_skew:
+    bullish: 0.65
+    bearish: 0.35
+    mixed: 0.5
+    uncertain: 0.5
+
+ranking:
+  max_items: 50
+  top_must_read: 10
+  weights:
+    severity: 1.0               # base
+    scope:                      # multiplier
+      index: 1.25
+      sector: 1.10
+      single_stock: 1.0
+    surprise:                   # additive
+      low: 0.0
+      medium: 0.4
+      high: 0.9
+    confidence:                 # multiplier
+      low: 0.85
+      medium: 1.0
+      high: 1.05
+    coverage_per_extra_source: 0.25   # additive per extra outlet covering the story
+    coverage_cap: 1.0
+    cap_bucket:                 # additive, best bucket among direct stocks
+      Large: 0.5
+      Mid: 0.25
+      Small: 0.0
+      Unknown: 0.0
