@@ -6,6 +6,8 @@
   "attchmntText": "Vertoz Limited has submitted to the Exchange, the financial results for the period ended September 30, 2026.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/VERTOZ_13112026234852_outcome_Financial_results.pdf",
   "sm_name": "Vertoz Limited",
+  "sm_isin": "INE188Y01015",
+  "smIndustry": null,
   "sort_date": "2026-11-13 23:50:42"
  },
  {
@@ -15,6 +17,8 @@
   "attchmntText": "Sarveshwar Foods Limited has informed the Exchange about approval of incorporation of a wholly owned subsidiary in the Netherlands.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/SARVESHWAR_13112026233804_reg_30_subsidiary__1_.pdf",
   "sm_name": "Sarveshwar Foods Limited",
+  "sm_isin": "INE324X01018",
+  "smIndustry": null,
   "sort_date": "2026-11-13 23:38:30"
  },
  {
@@ -24,6 +28,8 @@
   "attchmntText": "Sarveshwar Foods Limited has informed the Exchange regarding a press release dated November 13, 2026, titled \"Sarveshwar Foods Limited Explores Strategic Opportunities to Strengthen Logistics and Warehousing Infrastructure\".",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/SARVESHWAR_13112026232900_press_release_final__1_.pdf",
   "sm_name": "Sarveshwar Foods Limited",
+  "sm_isin": "INE324X01018",
+  "smIndustry": null,
   "sort_date": "2026-11-13 23:29:24"
  },
  {
@@ -33,6 +39,8 @@
   "attchmntText": "Sarveshwar Foods Limited has submitted to the Exchange regrading the unaudited standalone and consolidated financial results along with limited review Report for the Quarter and Half Year ended September 30, 2026.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/SARVESHWAR_13112026232141_CA_merged__1___2___1_.pdf",
   "sm_name": "Sarveshwar Foods Limited",
+  "sm_isin": "INE324X01018",
+  "smIndustry": null,
   "sort_date": "2026-11-13 23:24:41"
  },
  {
@@ -42,6 +50,8 @@
   "attchmntText": "Prime Focus Limited has submitted to the Exchange, the financial results for the period ended September 30, 2026.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/PFOCUS_13112026231037_Outcome_of_BM-_signed.pdf",
   "sm_name": "Prime Focus Limited",
+  "sm_isin": "INE367G01020",
+  "smIndustry": "Media & Entertainment",
   "sort_date": "2026-11-13 23:10:52"
  },
  {
@@ -51,6 +61,8 @@
   "attchmntText": "Ritco Logistics Limited has submitted to the Exchange, the financial results for the period ended September 30, 2026.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/RITCO_13112026225022_Outcome_of_the_BM_Ritco_13th_Nov_2026.pdf",
   "sm_name": "Ritco Logistics Limited",
+  "sm_isin": "INE01EG01016",
+  "smIndustry": null,
   "sort_date": "2026-11-13 22:56:41"
  },
  {
@@ -60,6 +72,8 @@
   "attchmntText": "Madhucon Projects Limited has submitted to the Exchange, the financial results for the period ended September 30, 2026.",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/MADHUCON_13112026224225_OutcomeBOD13112026MR.pdf",
   "sm_name": "Madhucon Projects Limited",
+  "sm_isin": "INE378D01032",
+  "smIndustry": "Construction",
   "sort_date": "2026-11-13 22:53:49"
  },
  {
@@ -69,6 +83,8 @@
   "attchmntText": "Pricol Limited has informed the Exchange regarding a press release dated November 13, 2026, titled \"Pricol and Warburg Pincus Jointly Announce Agreement for Promoter Stake Sale in Pricol Autotech Limited\".",
   "attchmntFile": "https://nsearchives.nseindia.in/corporate/PRICOLLTD_13112026225017_sedisclosure.pdf",
   "sm_name": "Pricol Limited",
+  "sm_isin": "INE726V01018",
+  "smIndustry": null,
   "sort_date": "2026-11-13 22:50:34"
  }
 ]
