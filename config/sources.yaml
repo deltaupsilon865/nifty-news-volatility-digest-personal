@@ -102,6 +102,25 @@ routine_announcement_phrases:
   - shareholding pattern
   - secretarial compliance
   - book closure
+  - monitoring agency report
+  - esg rating
+  - compliance officer
+  - interest payment certificate
+  - payment of interest on ncd
+  - grant of stock options
+  - grant of restricted stock
+  - exercise of
+  - postal ballot
+  - statement of utilization
+  - utilisation of issue proceeds
+  - audio clip
+  - audio link
+  - transcript
+  - registered office of rta
+  - allotment of non convertible
+  - redemption of debentures
+  - employees' stock option trust
+  - notice of extraordinary general meeting
 
 # Generic news with these keywords (in title) is dropped as clearly irrelevant.
 irrelevant_keywords:

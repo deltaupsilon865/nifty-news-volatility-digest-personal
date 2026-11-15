@@ -1,0 +1,118 @@
+# Common short names -> NSE symbol. Keys are matched case-insensitively after
+# normalisation. Symbols not present in EQUITY_L.csv are ignored automatically.
+aliases:
+  sbi: SBIN
+  state bank: SBIN
+  l&t: LT
+  larsen: LT
+  hul: HINDUNILVR
+  hindustan unilever: HINDUNILVR
+  ril: RELIANCE
+  reliance: RELIANCE
+  m&m: M&M
+  mahindra: M&M
+  mahindra and mahindra: M&M
+  infosys: INFY
+  tcs: TCS
+  hdfc bank: HDFCBANK
+  icici bank: ICICIBANK
+  airtel: BHARTIARTL
+  bharti airtel: BHARTIARTL
+  kotak: KOTAKBANK
+  kotak bank: KOTAKBANK
+  kotak mahindra bank: KOTAKBANK
+  axis bank: AXISBANK
+  sun pharma: SUNPHARMA
+  dr reddy's: DRREDDY
+  dr reddys: DRREDDY
+  hcl tech: HCLTECH
+  hcltech: HCLTECH
+  tech mahindra: TECHM
+  ongc: ONGC
+  ntpc: NTPC
+  power grid: POWERGRID
+  coal india: COALINDIA
+  bpcl: BPCL
+  ioc: IOC
+  indian oil: IOC
+  hpcl: HINDPETRO
+  gail: GAIL
+  zomato: ETERNAL
+  eternal: ETERNAL
+  paytm: PAYTM
+  one97: PAYTM
+  nykaa: NYKAA
+  fsn e-commerce: NYKAA
+  bajaj auto: BAJAJ-AUTO
+  hero motocorp: HEROMOTOCO
+  eicher: EICHERMOT
+  eicher motors: EICHERMOT
+  ultratech: ULTRACEMCO
+  ultratech cement: ULTRACEMCO
+  asian paints: ASIANPAINT
+  nestle: NESTLEIND
+  nestle india: NESTLEIND
+  jsw steel: JSWSTEEL
+  tata steel: TATASTEEL
+  vedanta: VEDL
+  sail: SAIL
+  bhel: BHEL
+  hal: HAL
+  hindustan aeronautics: HAL
+  bel: BEL
+  bharat electronics: BEL
+  irctc: IRCTC
+  lic: LICI
+  life insurance corporation: LICI
+  pnb: PNB
+  punjab national bank: PNB
+  bank of baroda: BANKBARODA
+  bob: BANKBARODA
+  canara bank: CANBK
+  indusind: INDUSINDBK
+  indusind bank: INDUSINDBK
+  yes bank: YESBANK
+  idfc first: IDFCFIRSTB
+  idfc first bank: IDFCFIRSTB
+  jio financial: JIOFIN
+  adani enterprises: ADANIENT
+  adani ports: ADANIPORTS
+  adani green: ADANIGREEN
+  adani power: ADANIPOWER
+  tata power: TATAPOWER
+  dmart: DMART
+  avenue supermarts: DMART
+  divi's: DIVISLAB
+  divis: DIVISLAB
+  shriram finance: SHRIRAMFIN
+  sbi life: SBILIFE
+  hdfc life: HDFCLIFE
+  apollo hospitals: APOLLOHOSP
+  tata consumer: TATACONSUM
+  bajaj finance: BAJFINANCE
+  bajaj finserv: BAJAJFINSV
+  ola electric: OLAELEC
+  indigo: INDIGO
+  interglobe: INDIGO
+  interglobe aviation: INDIGO
+  vodafone idea: IDEA
+  vi: IDEA
+  hyundai motor india: HYUNDAI
+  maruti: MARUTI
+  maruti suzuki: MARUTI
+  mazagon dock: MAZDOCK
+  cochin shipyard: COCHINSHIP
+  rvnl: RVNL
+  irfc: IRFC
+  nhpc: NHPC
+  rec: RECLTD
+  pfc: PFC
+  power finance: PFC
+  bse: BSE
+  mcx: MCX
+  cdsl: CDSL
+  nalco: NATIONALUM
+  nmdc: NMDC
+  hindustan zinc: HINDZINC
+  ltimindtree: LTIM
+  lti mindtree: LTIM

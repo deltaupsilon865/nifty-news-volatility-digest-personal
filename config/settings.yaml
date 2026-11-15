@@ -27,7 +27,7 @@ dedupe:
     "Google News": 5
 
 prefilter:
-  max_items_to_llm: 450         # safety cap after filtering (cost control)
+  max_items_to_llm: 700         # safety cap after filtering (cost control, ~$0.10 max)
   snippet_max_chars: 300
 
 scoring:
