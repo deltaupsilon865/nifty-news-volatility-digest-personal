@@ -4,13 +4,15 @@
 rss:
   - {name: Economic Times, url: "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms", enabled: true}
   - {name: Economic Times, url: "https://economictimes.indiatimes.com/markets/stocks/news/rssfeeds/2146842.cms", enabled: true}
-  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/marketreports.xml", enabled: true}
-  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/business.xml", enabled: true}
-  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/buzzingstocks.xml", enabled: true}
+  # Moneycontrol's RSS feeds stopped updating in April 2024 (checked Nov 2026); covered via
+  # site-restricted Google News queries below instead. Re-enable if they come back.
+  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/marketreports.xml", enabled: false}
+  - {name: Moneycontrol, url: "https://www.moneycontrol.com/rss/buzzingstocks.xml", enabled: false}
   - {name: Livemint, url: "https://www.livemint.com/rss/markets", enabled: true}
   - {name: Business Standard, url: "https://www.business-standard.com/rss/markets-106.rss", enabled: true}
   - {name: Hindu BusinessLine, url: "https://www.thehindubusinessline.com/markets/feeder/default.rss", enabled: true}
   - {name: RBI, url: "https://www.rbi.org.in/pressreleases_rss.xml", enabled: true}
+  # SEBI's own RSS is often empty; kept on, plus the listing scraper below.
   - {name: SEBI, url: "https://www.sebi.gov.in/sebirss.xml", enabled: true}
 
 google_news:
@@ -42,6 +44,16 @@ google_news:
     - realty stocks India
     - energy oil gas stocks India
     - telecom stocks India
+    - "site:moneycontrol.com stocks"
+    - "site:moneycontrol.com markets"
+    - "site:moneycontrol.com results"
+
+sebi:
+  enabled: true
+  stamp_time: "17:00"
+  pages:
+    - {label: "press release", url: "https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=6&ssid=23&smid=0"}
+    - {label: "circular", url: "https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=7&smid=0"}
 
 bse:
   enabled: true
