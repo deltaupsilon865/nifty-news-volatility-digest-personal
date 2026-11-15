@@ -108,3 +108,24 @@ ranking:
       Mid: 0.25
       Small: 0.0
       Unknown: 0.0
+      Index: 0.5
+
+# NSE index name -> Yahoo Finance ticker, and the sector names (from prompts/scoring.md)
+# that map onto each index. Broad-market items always get NIFTY 50.
+indices:
+  "NIFTY 50": {yahoo: "^NSEI", sectors: ["Broad Market"]}
+  "NIFTY BANK": {yahoo: "^NSEBANK", sectors: ["Banks"]}
+  "NIFTY FIN SERVICE": {yahoo: "NIFTY_FIN_SERVICE.NS", sectors: ["NBFC & Financials", "Insurance"]}
+  "NIFTY IT": {yahoo: "^CNXIT", sectors: ["IT"]}
+  "NIFTY PHARMA": {yahoo: "^CNXPHARMA", sectors: ["Pharma & Healthcare"]}
+  "NIFTY AUTO": {yahoo: "^CNXAUTO", sectors: ["Auto"]}
+  "NIFTY FMCG": {yahoo: "^CNXFMCG", sectors: ["FMCG", "Agri & Fertilisers"]}
+  "NIFTY METAL": {yahoo: "^CNXMETAL", sectors: ["Metals & Mining"]}
+  "NIFTY ENERGY": {yahoo: "^CNXENERGY", sectors: ["Oil & Gas", "Power & Utilities"]}
+  "NIFTY INFRA": {yahoo: "^CNXINFRA", sectors: ["Capital Goods & Infra", "Cement & Construction", "Telecom", "Railways", "Aviation & Logistics", "Defence"]}
+  "NIFTY REALTY": {yahoo: "^CNXREALTY", sectors: ["Realty"]}
+  "NIFTY MEDIA": {yahoo: "^CNXMEDIA", sectors: ["Media"]}
+  "NIFTY PSE": {yahoo: "^CNXPSE", sectors: ["PSU"]}
+max_stocks_per_item: 6
+max_sector_indices_per_item: 2
+vix_ticker: "^INDIAVIX"
