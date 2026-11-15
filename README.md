@@ -6,7 +6,7 @@
 
 Every trading morning at **08:00 IST**, an agentic pipeline reads Indian market news published since
 the previous 15:30 close. It scores each story's likely impact on same-day volatility and publishes
-the **top 50 items** to a free Streamlit dashboard. Each item comes with mapped NSE stocks or indices
+the **top 50 items** to a free static dashboard on Vercel. Each item comes with mapped NSE stocks or indices
 and a statistical **expected range** for the session.
 
 **Live app:** _LIVE_LINK_
@@ -35,7 +35,7 @@ and a statistical **expected range** for the session.
           ▼  6. rank (one function, weights in config) → top 50, ties by recency
           ▼  7. data/digests/YYYY-MM-DD.json + data/latest.json + evaluation.csv
           │
- GitHub Actions commits JSON ──► Streamlit Community Cloud redeploys (app never calls the LLM)
+ GitHub Actions commits JSON ──► Vercel rebuilds the static site (the site never calls the LLM)
 ```
 
 | Folder | What lives there |
@@ -49,7 +49,8 @@ and a statistical **expected range** for the session.
 | `ranking/` | The ranking formula |
 | `pipeline/` | Digest writer and accuracy evaluation |
 | `config/` | Every tunable: weights, thresholds, sources, holidays, events calendar |
-| `views/`, `app.py` | Streamlit dashboard and accuracy page |
+| `web/` | Static dashboard (HTML/CSS/JS, no framework) and accuracy page |
+| `scripts/build-web.mjs`, `vercel.json` | Vercel build: copies `data/` into the site |
 
 ### Expected range
 `baseline = ATR(20) / previous close`. The multiplier depends on severity: 1–3 → 1.0×, 4–6 → 1.3×,
@@ -64,7 +65,7 @@ The function is `ranking/rank.py::rank_score` and the weights are in `config/set
 
 | Item | Cost |
 |---|---|
-| GitHub Actions, Streamlit Community Cloud, yfinance, RSS, NSE/BSE | Free |
+| GitHub Actions, Vercel Hobby, yfinance, RSS, NSE/BSE | Free |
 | GNews API (optional) | Free tier, at most 8 of 100 daily requests |
 | Claude Haiku 5.5 for scoring ~550 items + mood | **≈ $0.05 per run**, about $1 per month |
 
@@ -78,7 +79,7 @@ python -m venv .venv && .venv/Scripts/activate      # Windows (source .venv/bin/
 pip install -r requirements.txt
 cp .env.example .env                                # then put your keys in .env (git-ignored)
 python run_pipeline.py --force                      # --force runs even on weekends/holidays
-streamlit run app.py
+node scripts/build-web.mjs && python -m http.server 8000 -d web   # open http://localhost:8000
 python -m pytest -q                                 # no network or API calls
 ```
 
@@ -87,7 +88,7 @@ python -m pytest -q                                 # no network or API calls
 1. Fork or clone this repo and push it to GitHub.
 2. Add the secrets with `gh secret set ANTHROPIC_API_KEY` (paste at the prompt) and, optionally, `gh secret set GNEWS_API_KEY`.
 3. Start the first run with `gh workflow run daily_digest.yml -f force=true`, then follow it with `gh run watch`.
-4. At [share.streamlit.io](https://share.streamlit.io), click **Create app**, pick the repo, set branch `main` and main file `app.py`, then click **Deploy**. The app needs no secrets.
+4. At [vercel.com/new](https://vercel.com/new), import the GitHub repo and click **Deploy**. `vercel.json` already sets the build command and output folder, and the site needs no secrets or environment variables.
 5. Each morning's commit to `data/` triggers an automatic redeploy.
 
 ## Portfolio feature

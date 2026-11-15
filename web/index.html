@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nifty News Volatility Digest</title>
+  <meta name="description" content="Each trading morning, Indian market news since the last close is scored for likely same-day volatility, with mapped NSE stocks and expected ranges.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232f6fbf'/><path d='M6 22l6-7 5 4 9-11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Nifty News Volatility Digest</h1>
+        <p class="sub">Market-moving news since the last close, scored for same-day volatility</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" class="tab active" data-view="digest" aria-selected="true">Today's digest</button>
+      <button role="tab" class="tab" data-view="accuracy" aria-selected="false">Accuracy</button>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <button class="filters-toggle" id="filtersToggle" aria-expanded="false">Filters &amp; portfolio</button>
+      <div class="sidebar-body" id="sidebarBody">
+        <label class="field">
+          <span>Digest date</span>
+          <select id="dateSelect"></select>
+        </label>
+
+        <fieldset class="field">
+          <legend>Market cap</legend>
+          <div class="chips" id="capChips"></div>
+          <label class="switch"><input type="checkbox" id="indexToggle" checked> <span>Include index / macro news</span></label>
+        </fieldset>
+
+        <label class="field">
+          <span>Minimum severity <output id="sevOut">1</output></span>
+          <input type="range" id="sevRange" min="1" max="10" value="1">
+        </label>
+
+        <fieldset class="field">
+          <legend>Direction</legend>
+          <div class="chips" id="dirChips"></div>
+        </fieldset>
+
+        <label class="field">
+          <span>Sector</span>
+          <select id="sectorSelect"><option value="">All sectors</option></select>
+        </label>
+
+        <label class="field">
+          <span>Event type</span>
+          <select id="eventSelect"><option value="">All event types</option></select>
+        </label>
+
+        <label class="field">
+          <span>Search headline or symbol</span>
+          <input type="search" id="search" placeholder="e.g. HDFCBANK, results">
+        </label>
+
+        <button class="link-btn" id="resetFilters">Reset filters</button>
+
+        <div class="portfolio">
+          <h2>My portfolio</h2>
+          <p class="muted small">Optional. A CSV with <code>symbol</code> and <code>quantity</code> columns (Zerodha / Groww exports work). It is read in your browser only, never uploaded, and forgotten when you close the tab.</p>
+          <label class="file-btn">
+            <input type="file" id="portfolioFile" accept=".csv,text/csv">
+            <span>Choose holdings CSV</span>
+          </label>
+          <p class="small" id="portfolioStatus"></p>
+          <button class="link-btn" id="clearPortfolio" hidden>Clear portfolio</button>
+        </div>
+      </div>
+    </aside>
+
+    <main id="main">
+      <section id="view-digest">
+        <div class="metrics" id="metrics"></div>
+        <div class="mood" id="mood" hidden></div>
+        <div class="events" id="events" hidden></div>
+        <p class="muted small" id="showing"></p>
+        <div id="items"></div>
+        <details class="pipeline">
+          <summary>Pipeline details</summary>
+          <div id="pipelineDetails"></div>
+        </details>
+      </section>
+
+      <section id="view-accuracy" hidden>
+        <h2 class="section-title">Accuracy tracker</h2>
+        <p class="muted">Each morning the pipeline checks earlier digests against what actually happened in that session. Did the stock stay inside its expected range? For bullish and bearish items, did it close in the predicted direction?</p>
+        <div id="accuracyBody"></div>
+      </section>
+
+      <footer class="disclaimer">
+        <strong>Not investment advice.</strong> This digest is generated automatically from public headlines and an AI model's judgement, which can be wrong. Expected ranges are statistical estimates from recent volatility, not price predictions. Always read the original source and do your own research before trading.
+      </footer>
+    </main>
+  </div>
+
+  <div class="tooltip" id="tooltip" role="status" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>
