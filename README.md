@@ -1,7 +1,7 @@
 # 📈 Nifty News Volatility Digest
 
-[![Daily digest](https://github.com/OWNER/nifty-news-volatility-digest/actions/workflows/daily_digest.yml/badge.svg)](https://github.com/OWNER/nifty-news-volatility-digest/actions/workflows/daily_digest.yml)
-[![Tests](https://github.com/OWNER/nifty-news-volatility-digest/actions/workflows/tests.yml/badge.svg)](https://github.com/OWNER/nifty-news-volatility-digest/actions/workflows/tests.yml)
+[![Daily digest](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/daily_digest.yml/badge.svg)](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/daily_digest.yml)
+[![Tests](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/tests.yml/badge.svg)](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Every trading morning at **08:00 IST**, an agentic pipeline reads Indian market news published since
