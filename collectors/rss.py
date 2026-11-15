@@ -56,7 +56,7 @@ class RSSCollector(Collector):
         super().__init__(window_start, window_end)
         self.source_name = source_name
         self.url = url
-        self.name = f"RSS: {source_name} ({url.split('/')[2]}{'/'.join(url.split('/')[3:5])[:30]})"
+        self.name = f"{source_name} RSS ({'/'.join(url.split('/')[3:5])[:30]})"
 
     def fetch(self) -> list[NewsItem]:
         session = make_session()

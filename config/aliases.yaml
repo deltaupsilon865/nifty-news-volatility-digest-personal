@@ -3,6 +3,13 @@
 aliases:
   sbi: SBIN
   state bank: SBIN
+  tata motors pv: TMPV
+  tata motors passenger vehicles: TMPV
+  tata motors passenger: TMPV
+  jlr: TMPV
+  jaguar land rover: TMPV
+  tata motors cv: TMCV
+  tata motors commercial vehicles: TMCV
   l&t: LT
   larsen: LT
   hul: HINDUNILVR

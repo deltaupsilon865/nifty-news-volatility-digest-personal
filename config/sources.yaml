@@ -12,8 +12,8 @@ rss:
   - {name: Business Standard, url: "https://www.business-standard.com/rss/markets-106.rss", enabled: true}
   - {name: Hindu BusinessLine, url: "https://www.thehindubusinessline.com/markets/feeder/default.rss", enabled: true}
   - {name: RBI, url: "https://www.rbi.org.in/pressreleases_rss.xml", enabled: true}
-  # SEBI's own RSS is often empty; kept on, plus the listing scraper below.
-  - {name: SEBI, url: "https://www.sebi.gov.in/sebirss.xml", enabled: true}
+  # SEBI's own RSS has been empty; the listing scraper (sebi: below) covers SEBI instead.
+  - {name: SEBI, url: "https://www.sebi.gov.in/sebirss.xml", enabled: false}
 
 google_news:
   enabled: true

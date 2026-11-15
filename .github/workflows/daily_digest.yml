@@ -1,0 +1,59 @@
+name: Daily digest
+
+on:
+  schedule:
+    - cron: "30 2 * * 1-5"   # 02:30 UTC = 08:00 IST, Monday-Friday
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Run even if today is an NSE holiday"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          SCORING_MODEL: ${{ vars.SCORING_MODEL }}
+          MAX_DAILY_LLM_USD: ${{ vars.MAX_DAILY_LLM_USD }}
+          TZ: Asia/Kolkata
+        run: |
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            python run_pipeline.py --force
+          else
+            python run_pipeline.py
+          fi
+
+      - name: Commit digest if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/digests data/latest.json data/evaluation.csv data/reference 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit (holiday or nothing new)."
+          else
+            git commit -m "Digest $(TZ=Asia/Kolkata date +%Y-%m-%d) [skip ci]"
+            git push
+          fi

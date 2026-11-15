@@ -8,6 +8,7 @@ from datetime import timedelta
 from dateutil import parser as dtparser
 
 from collectors.base import Collector, build_item
+from common.log import get_logger
 from common.http import make_session, timeout
 from common.market_calendar import IST
 from common.models import NewsItem
@@ -46,6 +47,9 @@ def parse_bse_rows(rows: list[dict]) -> list[NewsItem]:
     return out
 
 
+log = get_logger("collectors.bse")
+
+
 class BSECollector(Collector):
     def __init__(self, window_start, window_end, cfg: dict):
         super().__init__(window_start, window_end)
@@ -66,9 +70,16 @@ class BSECollector(Collector):
             for page in range(1, int(self.cfg.get("max_pages", 8)) + 1):
                 params = {"pageno": page, "strCat": -1, "strPrevDate": stamp, "strScrip": "",
                           "strSearch": "P", "strToDate": stamp, "strType": "C", "subcategory": -1}
-                resp = session.get(self.cfg["url"], params=params, timeout=timeout())
-                resp.raise_for_status()
-                rows = (resp.json() or {}).get("Table") or []
+                try:
+                    resp = session.get(self.cfg["url"], params=params, timeout=timeout())
+                    resp.raise_for_status()
+                    rows = (resp.json() or {}).get("Table") or []
+                except Exception as exc:  # noqa: BLE001
+                    # BSE answers 400 past the last page; keep what we already have.
+                    if page == 1 and not items and day == self.window_end.date():
+                        raise
+                    log.debug("BSE %s page %d stopped: %s", stamp, page, exc)
+                    break
                 if not rows:
                     break
                 items.extend(parse_bse_rows(rows))

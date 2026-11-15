@@ -154,6 +154,6 @@ class Digest(BaseModel):
     india_vix_change_pct: float | None = None
     nifty_prev_close: float | None = None
     events: list[EventEntry] = Field(default_factory=list)
-    source_stats: dict[str, dict[str, int | str]] = Field(default_factory=dict)
+    source_stats: dict[str, dict[str, float | int | str]] = Field(default_factory=dict)
     pipeline_stats: dict[str, float | int | str] = Field(default_factory=dict)
     items: list[DigestItem] = Field(default_factory=list)
