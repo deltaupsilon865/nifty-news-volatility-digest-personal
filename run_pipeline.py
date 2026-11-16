@@ -43,9 +43,12 @@ def already_generated_today(trading_date: str, now: datetime) -> bool:
     if not path.exists():
         return False
     try:
-        generated = load_digest(path).generated_at
+        digest = load_digest(path)
     except Exception:  # unreadable file: regenerate it
         return False
+    if not digest.items:  # an empty digest is never a reason to skip
+        return False
+    generated = digest.generated_at
     if generated.tzinfo is not None and now.tzinfo is not None:
         generated = generated.astimezone(now.tzinfo)
     return generated.date() == now.date()
@@ -58,6 +61,11 @@ def run(force: bool = False, now: datetime | None = None) -> int:
         log.info("%s is not an NSE trading day (%s) - nothing to do.", now.date(),
                  hols.get(now.date(), "weekend"))
         return 0
+
+    if not config.env("ANTHROPIC_API_KEY"):
+        log.error("ANTHROPIC_API_KEY is not set - add it as a GitHub Actions secret "
+                  "(repo Settings > Secrets and variables > Actions). Nothing was published.")
+        return 1
 
     settings = config.settings()
     deadline = Deadline(float(settings.get("max_run_seconds", 900)))
@@ -130,6 +138,12 @@ def run(force: bool = False, now: datetime | None = None) -> int:
     scores = judge.score(items, context, hints)
     min_sev = int(settings["scoring"].get("min_severity_to_keep", 2))
     stats["scored"] = len(scores)
+    if items and not scores:
+        # Every LLM call failed (bad key, no credit, outage). Keep the previous digest
+        # instead of publishing an empty one, and fail the workflow so it is noticed.
+        log.error("All %d items failed scoring (see warnings above) - nothing was published.",
+                  len(items))
+        return 1
     by_id = {it.id: it for it in items}
     scored = [(by_id[sid], s) for sid, s in scores.items() if s.severity >= min_sev]
     stats["kept_after_scoring"] = len(scored)

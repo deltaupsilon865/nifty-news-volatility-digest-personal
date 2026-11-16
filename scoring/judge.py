@@ -27,7 +27,10 @@ def scoring_model() -> str:
 def make_client():
     import anthropic
 
-    return anthropic.Anthropic(max_retries=4, timeout=120.0)
+    key = config.env("ANTHROPIC_API_KEY")
+    if not key:  # an unset GitHub secret arrives as "", which the SDK would accept
+        raise RuntimeError("ANTHROPIC_API_KEY is not set (add it as a GitHub Actions secret)")
+    return anthropic.Anthropic(api_key=key, max_retries=4, timeout=120.0)
 
 
 def _rubric() -> str:
