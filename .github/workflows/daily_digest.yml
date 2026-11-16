@@ -2,7 +2,12 @@ name: Daily digest
 
 on:
   schedule:
-    - cron: "30 2 * * 1-5"   # 02:30 UTC = 08:00 IST, Monday-Friday
+    # 08:00 IST, Monday-Friday, plus backup slots at 08:30 and 09:00 IST: GitHub's scheduler
+    # is best-effort and sometimes drops or delays triggers. Backup runs exit immediately
+    # once today's digest exists.
+    - cron: "30 2 * * 1-5"
+    - cron: "0 3 * * 1-5"
+    - cron: "30 3 * * 1-5"
   workflow_dispatch:
     inputs:
       force:

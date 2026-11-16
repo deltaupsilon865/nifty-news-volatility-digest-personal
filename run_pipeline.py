@@ -36,6 +36,21 @@ class Deadline:
         return self.remaining() > needed
 
 
+def already_generated_today(trading_date: str, now: datetime) -> bool:
+    """True if data/digests/<trading_date>.json exists and was generated on today's IST date."""
+    from pipeline.output import digests_dir, load_digest
+    path = digests_dir() / f"{trading_date}.json"
+    if not path.exists():
+        return False
+    try:
+        generated = load_digest(path).generated_at
+    except Exception:  # unreadable file: regenerate it
+        return False
+    if generated.tzinfo is not None and now.tzinfo is not None:
+        generated = generated.astimezone(now.tzinfo)
+    return generated.date() == now.date()
+
+
 def run(force: bool = False, now: datetime | None = None) -> int:
     now = now or now_ist()
     hols = holidays()
@@ -50,6 +65,12 @@ def run(force: bool = False, now: datetime | None = None) -> int:
     log.info("Digest for %s; news window %s -> %s", target, ws.strftime("%a %d %b %H:%M"),
              we.strftime("%a %d %b %H:%M"))
     stats: dict[str, float | int | str] = {}
+
+    # The workflow has backup cron slots in case GitHub drops a scheduled trigger; a later
+    # slot does nothing (and spends nothing) if this morning's digest is already published.
+    if not force and already_generated_today(target.isoformat(), now):
+        log.info("Digest for %s was already generated today - nothing to do.", target)
+        return 0
 
     # Reference data (best effort; falls back to the committed copies)
     from mapping.market_cap import MarketCapTable, is_penny
