@@ -211,12 +211,23 @@ function renderDigest() {
       return ha - hb || a.rank - b.rank;
     });
   }
-  $("showing").textContent = `Showing ${shown.length} of ${dg.items.length} items · news since ${fmtIST(dg.window_start, { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false })} IST`;
-  const top = shown.slice(0, TOP_N), rest = shown.slice(TOP_N);
+  const since = fmtIST(dg.window_start, { weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+  $("showing").textContent = `Showing ${shown.length} of ${dg.items.length} items · news since ${since} IST`;
+  const holdingsNote = Object.keys(state.holdings).length ? " · your holdings first" : "";
+  const catchup = dg.mode === "catchup";
   let html = "";
-  if (!shown.length) html = `<div class="empty">No items match these filters.</div>`;
-  if (top.length) html += `<h2 class="section-title">Top ${top.length} must-read${Object.keys(state.holdings).length ? " · your holdings first" : ""}</h2>` + top.map((it) => card(it, dg.trading_date)).join("");
-  if (rest.length) html += `<h2 class="section-title">More news</h2>` + rest.map((it) => card(it, dg.trading_date)).join("");
+  if (catchup) {
+    const n = dg.missed_sessions || 0;
+    html += `<div class="catchup-note"><b>Catch-up digest.</b> No digest was made for ${n} trading session${n === 1 ? "" : "s"}, so this covers all news since ${esc(since)} IST, ranked by how likely it is to move prices at the next open. Older news the market has already traded through is scored lower.</div>`;
+  }
+  if (!shown.length) html += `<div class="empty">No items match these filters.</div>`;
+  else if (catchup) {
+    html += `<h2 class="section-title">All findings, ranked by severity${holdingsNote}</h2>` + shown.map((it) => card(it, dg.trading_date)).join("");
+  } else {
+    const top = shown.slice(0, TOP_N), rest = shown.slice(TOP_N);
+    if (top.length) html += `<h2 class="section-title">Top ${top.length} must-read${holdingsNote}</h2>` + top.map((it) => card(it, dg.trading_date)).join("");
+    if (rest.length) html += `<h2 class="section-title">More news</h2>` + rest.map((it) => card(it, dg.trading_date)).join("");
+  }
   $("items").innerHTML = html;
 
   const ss = dg.source_stats || {};

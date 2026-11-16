@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 
 from common import config
@@ -37,8 +37,19 @@ def _rubric() -> str:
     return (config.PROMPTS_DIR / "scoring.md").read_text(encoding="utf-8")
 
 
-def day_context(trading_date: date, events: list[EventEntry], vix: float | None = None) -> str:
-    lines = [f"## Today's context\n\nTrading session: {trading_date:%A %d %B %Y} (NSE)."]
+def day_context(trading_date: date, events: list[EventEntry], vix: float | None = None,
+                catchup: tuple[datetime, datetime, int] | None = None) -> str:
+    lines = [f"## Today's context\n\nTrading session: {trading_date:%A %d %B %Y} (NSE). "
+             "Score every item for its likely impact from this session's open."]
+    if catchup:
+        start, end, missed = catchup
+        lines.append(
+            f"CATCH-UP DIGEST: no digest was produced for {missed} trading session(s), so the items "
+            f"span {start:%a %d %b %H:%M} to {end:%a %d %b %H:%M} IST. Each item's published_at "
+            "shows its age. Still score severity for the upcoming session's open: news that "
+            "markets have already traded through in later sessions is largely priced in and "
+            "should be scored lower, unless it is still developing, has a pending trigger "
+            "(record date, vote, deadline, results, policy action) or keeps driving the trend.")
     if vix is not None:
         lines.append(f"India VIX at last close: {vix:.2f}.")
     if events:

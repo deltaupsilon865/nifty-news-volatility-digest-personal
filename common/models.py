@@ -146,6 +146,8 @@ class EventEntry(BaseModel):
 class Digest(BaseModel):
     schema_version: int = 1
     trading_date: str  # the session this digest is for (YYYY-MM-DD)
+    mode: str = "daily"  # "daily" or "catchup" (one or more sessions had no digest)
+    missed_sessions: int = 0  # sessions without a digest that a catch-up covers
     generated_at: datetime
     window_start: datetime
     window_end: datetime

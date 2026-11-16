@@ -84,7 +84,7 @@ h1 { font-size: 1.15rem; margin: 0; letter-spacing: -0.01em; }
 
 /* ---------- layout ---------- */
 .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 24px; max-width: 1280px; margin: 0 auto; padding: 20px 24px 40px; }
-.sidebar { position: sticky; top: 82px; align-self: start; max-height: calc(100vh - 100px); overflow: auto; }
+.sidebar { position: sticky; top: 82px; align-self: start; max-height: calc(100vh - 100px); overflow-y: auto; overflow-x: hidden; }
 .filters-toggle { display: none; }
 .sidebar-body { display: flex; flex-direction: column; gap: 14px; }
 .field { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
@@ -106,7 +106,7 @@ output { font-weight: 700; color: var(--ink); margin-left: 4px; }
 .link-btn { align-self: flex-start; background: none; border: 0; color: var(--accent); font: inherit; font-size: 0.85rem; padding: 0; cursor: pointer; text-decoration: underline; }
 .portfolio { border-top: 1px solid var(--border); padding-top: 14px; }
 .portfolio h2 { font-size: 0.95rem; margin: 0 0 4px; }
-.file-btn { position: relative; display: inline-block; }
+.file-btn { position: relative; display: inline-block; overflow: hidden; }
 .file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 .file-btn span {
   display: inline-block; font-size: 0.85rem; border: 1px solid var(--border); background: var(--surface);
@@ -187,4 +187,15 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .card { grid-template-columns: 40px minmax(0, 1fr); padding: 12px; gap: 10px; }
   .sev .num { width: 34px; height: 34px; font-size: 1.05rem; }
+}
+
+.catchup-note {
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0 0 12px;
+  color: var(--ink);
+  line-height: 1.5;
 }

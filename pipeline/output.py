@@ -1,4 +1,4 @@
-"""Stage 7: write the digest JSON files the Streamlit app reads."""
+"""Stage 7: write the digest JSON files the web dashboard reads."""
 from __future__ import annotations
 
 import json
@@ -31,3 +31,19 @@ def load_digest(path: Path) -> Digest:
 def list_digest_dates(data_dir: Path | None = None) -> list[str]:
     ddir = (data_dir or config.DATA_DIR) / "digests"
     return sorted((p.stem for p in ddir.glob("????-??-??.json")), reverse=True)
+
+
+def latest_published_digest(on_or_before: str, data_dir: Path | None = None) -> Digest | None:
+    """The newest digest with at least one item for a session on or before `on_or_before`.
+    Empty or unreadable digests (failed runs) are skipped."""
+    ddir = (data_dir or config.DATA_DIR) / "digests"
+    for d in list_digest_dates(data_dir):
+        if d > on_or_before:
+            continue
+        try:
+            digest = load_digest(ddir / f"{d}.json")
+        except Exception:  # noqa: BLE001
+            continue
+        if digest.items:
+            return digest
+    return None

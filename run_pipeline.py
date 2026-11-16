@@ -1,8 +1,8 @@
-"""Daily pipeline: collect -> filter/dedupe -> LLM judge -> map -> ranges -> rank -> write JSON.
+"""Digest pipeline: collect -> filter/dedupe -> LLM judge -> map -> ranges -> rank -> write JSON.
 
-Usage:
-    python run_pipeline.py            # skips NSE holidays and weekends
-    python run_pipeline.py --force    # run anyway (e.g. manual test on a weekend)
+Run on demand (`python run_pipeline.py`, or "Run workflow" on GitHub). If one or more
+sessions went by since the last digest, it builds a catch-up digest covering all of them
+(see pipeline/catchup.py).
 """
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from datetime import datetime
 
 from common import config
 from common.log import get_logger, setup_logging
-from common.market_calendar import collection_window, events_for, holidays, is_trading_day, now_ist
+from common.market_calendar import events_for, holidays, now_ist, target_trading_date
 from common.models import Digest, DigestItem, NewsItem
 
 log = get_logger("pipeline")
@@ -36,31 +36,9 @@ class Deadline:
         return self.remaining() > needed
 
 
-def already_generated_today(trading_date: str, now: datetime) -> bool:
-    """True if data/digests/<trading_date>.json exists and was generated on today's IST date."""
-    from pipeline.output import digests_dir, load_digest
-    path = digests_dir() / f"{trading_date}.json"
-    if not path.exists():
-        return False
-    try:
-        digest = load_digest(path)
-    except Exception:  # unreadable file: regenerate it
-        return False
-    if not digest.items:  # an empty digest is never a reason to skip
-        return False
-    generated = digest.generated_at
-    if generated.tzinfo is not None and now.tzinfo is not None:
-        generated = generated.astimezone(now.tzinfo)
-    return generated.date() == now.date()
-
-
-def run(force: bool = False, now: datetime | None = None) -> int:
+def run(now: datetime | None = None) -> int:
     now = now or now_ist()
     hols = holidays()
-    if not force and not is_trading_day(now.date(), hols):
-        log.info("%s is not an NSE trading day (%s) - nothing to do.", now.date(),
-                 hols.get(now.date(), "weekend"))
-        return 0
 
     if not config.env("ANTHROPIC_API_KEY"):
         log.error("ANTHROPIC_API_KEY is not set - add it as a GitHub Actions secret "
@@ -69,16 +47,17 @@ def run(force: bool = False, now: datetime | None = None) -> int:
 
     settings = config.settings()
     deadline = Deadline(float(settings.get("max_run_seconds", 900)))
-    target, ws, we = collection_window(now, hols)
-    log.info("Digest for %s; news window %s -> %s", target, ws.strftime("%a %d %b %H:%M"),
-             we.strftime("%a %d %b %H:%M"))
-    stats: dict[str, float | int | str] = {}
-
-    # The workflow has backup cron slots in case GitHub drops a scheduled trigger; a later
-    # slot does nothing (and spends nothing) if this morning's digest is already published.
-    if not force and already_generated_today(target.isoformat(), now):
-        log.info("Digest for %s was already generated today - nothing to do.", target)
-        return 0
+    from pipeline.catchup import plan_window
+    from pipeline.output import latest_published_digest
+    target = target_trading_date(now, hols)
+    plan = plan_window(now, hols, latest_published_digest(target.isoformat()))
+    ws, we = plan.start, plan.end
+    rcfg = settings["ranking"]
+    max_items = int(rcfg.get("catchup_max_items", 100) if plan.is_catchup else rcfg["max_items"])
+    log.info("%s digest for %s; news window %s -> %s%s", plan.mode.capitalize(), target,
+             ws.strftime("%a %d %b %H:%M"), we.strftime("%a %d %b %H:%M"),
+             f" ({plan.missed_sessions} missed sessions)" if plan.is_catchup else "")
+    stats: dict[str, float | int | str] = {"mode": plan.mode}
 
     # Reference data (best effort; falls back to the committed copies)
     from mapping.market_cap import MarketCapTable, is_penny
@@ -128,7 +107,8 @@ def run(force: bool = False, now: datetime | None = None) -> int:
     vix, vix_chg = prices.last_close_change(vix_t)
     nifty_close, _ = prices.last_close_change(nifty_t)
     events = events_for(target, hols)
-    context = day_context(target, events, vix)
+    context = day_context(target, events, vix,
+                          catchup=(ws, we, plan.missed_sessions) if plan.is_catchup else None)
     hints = {}
     for it in items:
         m = mapper.from_raw_tickers(it.raw_tickers)
@@ -158,9 +138,14 @@ def run(force: bool = False, now: datetime | None = None) -> int:
         stocks, unmapped = builder.build(it, s)
         mapped[it.id] = (it, s, stocks, unmapped)
 
+    def order_key(rscore: float, severity: int) -> float:
+        # Catch-up digests are ordered by severity first; rank_score only breaks ties.
+        return severity * 100 + rscore if plan.is_catchup else rscore
+
     # Preliminary ranking (before prices) decides which items get price data.
-    prelim = [(rank_score(s, it, st), it.published_at, it.id) for it, s, st, _ in mapped.values()]
-    keep_ids = select_top(prelim, int(settings["ranking"]["max_items"]) + 20)
+    prelim = [(order_key(rank_score(s, it, st), s.severity), it.published_at, it.id)
+              for it, s, st, _ in mapped.values()]
+    keep_ids = select_top(prelim, max_items + 20)
 
     # Stage 5: expected ranges
     vcfg = settings["volatility"]
@@ -188,10 +173,10 @@ def run(force: bool = False, now: datetime | None = None) -> int:
     stats["stocks_with_range"] = ranged
 
     # Stage 6: final ranking
-    final = [(rank_score(mapped[i][1], mapped[i][0], mapped[i][2]), mapped[i][0].published_at, i)
+    score_of = {i: rank_score(mapped[i][1], mapped[i][0], mapped[i][2]) for i in keep_ids}
+    final = [(order_key(score_of[i], mapped[i][1].severity), mapped[i][0].published_at, i)
              for i in keep_ids]
-    score_of = {e[2]: e[0] for e in final}
-    top_ids = select_top(final)
+    top_ids = select_top(final, max_items)
     digest_items: list[DigestItem] = []
     for rank, iid in enumerate(top_ids, start=1):
         it, s, stocks, unmapped = mapped[iid]
@@ -219,7 +204,8 @@ def run(force: bool = False, now: datetime | None = None) -> int:
 
     stats.update(judge.tracker.summary())
     stats["run_seconds"] = round(deadline.elapsed, 1)
-    digest = Digest(trading_date=target.isoformat(), generated_at=now_ist(), window_start=ws,
+    digest = Digest(trading_date=target.isoformat(), mode=plan.mode,
+                    missed_sessions=plan.missed_sessions, generated_at=now_ist(), window_start=ws,
                     window_end=we, market_mood=mood, india_vix=vix, india_vix_change_pct=vix_chg,
                     nifty_prev_close=nifty_close, events=events, source_stats=source_stats,
                     pipeline_stats=stats, items=digest_items)
@@ -259,11 +245,12 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
     except Exception:  # noqa: BLE001
         pass
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--force", action="store_true", help="run even on weekends/holidays")
-    args = ap.parse_args()
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--force", action="store_true", help=argparse.SUPPRESS)  # old flag; no-op
+    ap.parse_args()
     setup_logging()
-    return run(force=args.force)
+    return run()
 
 
 if __name__ == "__main__":

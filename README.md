@@ -4,10 +4,15 @@
 [![Tests](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/tests.yml/badge.svg)](https://github.com/deltaupsilon865/nifty-news-volatility-digest-personal/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Every trading morning at **08:00 IST**, an agentic pipeline reads Indian market news published since
-the previous 15:30 close. It scores each story's likely impact on same-day volatility and publishes
-the **top 50 items** to a free static dashboard on Vercel. Each item comes with mapped NSE stocks or indices
-and a statistical **expected range** for the session.
+Whenever you click **Run workflow** on GitHub, an agentic pipeline reads Indian market news published since
+the last 15:30 close. It scores each story's likely impact on volatility from the next NSE open and publishes
+the **top 50 items** (top 10 must-read + more) to a free static dashboard on Vercel. Each item comes with
+mapped NSE stocks or indices and a statistical **expected range** for the session.
+
+**Catch-up mode:** if one or more trading sessions went by without a run, the next run covers all news since
+the previous digest (up to 31 days back) and publishes up to **100 items in one list ranked by severity**.
+Older news the market has already traded through is scored lower. Runs are manual only, so nothing is spent
+unless you start one (about $0.05 of Anthropic API usage per run).
 
 **Live app:** _LIVE_LINK_
 
@@ -78,7 +83,7 @@ and the spend estimate is logged every run.
 python -m venv .venv && .venv/Scripts/activate      # Windows (source .venv/bin/activate on macOS/Linux)
 pip install -r requirements.txt
 cp .env.example .env                                # then put your keys in .env (git-ignored)
-python run_pipeline.py --force                      # --force runs even on weekends/holidays
+python run_pipeline.py                              # daily or catch-up digest, decided automatically
 node scripts/build-web.mjs && python -m http.server 8000 -d web   # open http://localhost:8000
 python -m pytest -q                                 # no network or API calls
 ```
@@ -86,10 +91,10 @@ python -m pytest -q                                 # no network or API calls
 ## Deploy your own
 
 1. Fork or clone this repo and push it to GitHub.
-2. Add the secrets with `gh secret set ANTHROPIC_API_KEY` (paste at the prompt) and, optionally, `gh secret set GNEWS_API_KEY`.
-3. Start the first run with `gh workflow run daily_digest.yml -f force=true`, then follow it with `gh run watch`.
+2. Add the secrets under **Settings → Secrets and variables → Actions**: `ANTHROPIC_API_KEY` and, optionally, `GNEWS_API_KEY` (or `gh secret set ANTHROPIC_API_KEY` and paste at the prompt).
+3. Start a run from **Actions → Daily digest → Run workflow** (or `gh workflow run daily_digest.yml`).
 4. At [vercel.com/new](https://vercel.com/new), import the GitHub repo and click **Deploy**. `vercel.json` already sets the build command and output folder, and the site needs no secrets or environment variables.
-5. Each morning's commit to `data/` triggers an automatic redeploy.
+5. Each run's commit to `data/` triggers an automatic redeploy.
 
 ## Portfolio feature
 Upload a CSV with `symbol` and `quantity` columns, such as a Zerodha or Groww holdings export. News about

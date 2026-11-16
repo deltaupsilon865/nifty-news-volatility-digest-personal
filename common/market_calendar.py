@@ -50,27 +50,50 @@ def _close_time() -> time:
     return time(int(hh), int(mm))
 
 
+def _open_time() -> time:
+    hh, mm = config.settings().get("market_open_time", "09:15").split(":")
+    return time(int(hh), int(mm))
+
+
 def target_trading_date(now: datetime | None = None, hols: dict[date, str] | None = None) -> date:
-    """The session the digest is for: today if it is a trading day and the market hasn't
-    closed yet, otherwise the next trading day."""
+    """The session whose open the digest is for: today if it is a trading day and the market
+    hasn't opened yet, otherwise the next trading day."""
     now = (now or now_ist()).astimezone(IST)
     hols = holidays() if hols is None else hols
     today = now.date()
-    if is_trading_day(today, hols) and now.time() < _close_time():
+    if is_trading_day(today, hols) and now.time() < _open_time():
         return today
     return next_trading_day(today, hols)
 
 
+def last_close_before(now: datetime, hols: dict[date, str] | None = None) -> datetime:
+    """The most recent NSE session close at or before `now`."""
+    now = now.astimezone(IST)
+    hols = holidays() if hols is None else hols
+    today = now.date()
+    if is_trading_day(today, hols) and now.time() >= _close_time():
+        return datetime.combine(today, _close_time(), tzinfo=IST)
+    return datetime.combine(previous_trading_day(today, hols), _close_time(), tzinfo=IST)
+
+
+def trading_days_between(a: date, b: date, hols: dict[date, str] | None = None) -> list[date]:
+    """Trading days strictly after `a` and strictly before `b`."""
+    hols = holidays() if hols is None else hols
+    out, cur = [], a + timedelta(days=1)
+    while cur < b:
+        if is_trading_day(cur, hols):
+            out.append(cur)
+        cur += timedelta(days=1)
+    return out
+
+
 def collection_window(now: datetime | None = None,
                       hols: dict[date, str] | None = None) -> tuple[date, datetime, datetime]:
-    """Return (target_date, window_start, window_end). Window starts at the close of the
-    trading day before the target session."""
+    """Return (target_date, window_start, window_end) for a normal daily digest: news since
+    the most recent session close."""
     now = (now or now_ist()).astimezone(IST)
     hols = holidays() if hols is None else hols
-    target = target_trading_date(now, hols)
-    prev = previous_trading_day(target, hols)
-    start = datetime.combine(prev, _close_time(), tzinfo=IST)
-    return target, start, now
+    return target_trading_date(now, hols), last_close_before(now, hols), now
 
 
 def weekly_expiry(d: date, hols: dict[date, str] | None = None) -> date | None:

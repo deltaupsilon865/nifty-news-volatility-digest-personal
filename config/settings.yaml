@@ -1,7 +1,13 @@
 # Central settings. Every tunable number lives here.
 
 timezone: Asia/Kolkata
+market_open_time: "09:15"       # a run after this targets the next session's open
 market_close_time: "15:30"      # previous session close; collection window starts here
+
+catchup:
+  # A manual run after one or more sessions without a digest covers all the missed news,
+  # but never more than this many days back.
+  max_lookback_days: 31
 max_run_seconds: 900            # hard run-time limit for the whole pipeline
 http_timeout_seconds: 15
 user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
@@ -85,8 +91,9 @@ volatility:
     uncertain: 0.5
 
 ranking:
-  max_items: 50
+  max_items: 50                 # daily digest: top 10 must-read + more news
   top_must_read: 10
+  catchup_max_items: 100        # catch-up digest: one list ranked by severity
   weights:
     severity: 1.0               # base
     scope:                      # multiplier

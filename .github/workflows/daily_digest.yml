@@ -1,19 +1,10 @@
 name: Daily digest
 
+# Manual only: Actions > Daily digest > Run workflow. Each run costs roughly $0.05 of
+# Anthropic API usage. If sessions were missed since the last digest, the run produces a
+# catch-up digest covering all of them (up to 31 days, top 100 by severity).
 on:
-  schedule:
-    # 08:00 IST, Monday-Friday, plus backup slots at 08:30 and 09:00 IST: GitHub's scheduler
-    # is best-effort and sometimes drops or delays triggers. Backup runs exit immediately
-    # once today's digest exists.
-    - cron: "30 2 * * 1-5"
-    - cron: "0 3 * * 1-5"
-    - cron: "30 3 * * 1-5"
   workflow_dispatch:
-    inputs:
-      force:
-        description: "Run even if today is an NSE holiday"
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -44,12 +35,7 @@ jobs:
           SCORING_MODEL: ${{ vars.SCORING_MODEL }}
           MAX_DAILY_LLM_USD: ${{ vars.MAX_DAILY_LLM_USD }}
           TZ: Asia/Kolkata
-        run: |
-          if [ "${{ github.event.inputs.force }}" = "true" ]; then
-            python run_pipeline.py --force
-          else
-            python run_pipeline.py
-          fi
+        run: python run_pipeline.py
 
       - name: Commit digest if changed
         run: |
